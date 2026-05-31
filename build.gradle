@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.nklcbdty'
-version = '0.7.0'
+version = '0.8.0'
 
 ext {
     queryDslVersion = '5.0.0'
