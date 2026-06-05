@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.nklcbdty'
-version = '0.10.0'
+version = '0.10.1'
 
 ext {
     queryDslVersion = '5.0.0'
@@ -77,6 +77,16 @@ publishing {
                 username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
                 password = project.findProperty('gpr.token') ?: System.getenv('GITHUB_TOKEN')
             }
+        }
+        // 토큰 없이도 빌드 가능하도록 consumer 프로젝트들의 내장 offline-repo 에 동시 publish.
+        // (gradlew publishMavenJavaPublicationToNklcbdtyOfflineRepoRepository / ...BatchOfflineRepo... 로 개별 호출 가능)
+        maven {
+            name = 'NklcbdtyOfflineRepo'
+            url = uri('../nklcbdty/offline-repo')
+        }
+        maven {
+            name = 'NklcbdtyBatchOfflineRepo'
+            url = uri('../nklcbdty-batch/offline-repo')
         }
     }
 }
