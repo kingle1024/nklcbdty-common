@@ -2,6 +2,7 @@ package com.nklcbdty.common.email;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.nklcbdty.common.vo.Job_mst;
@@ -26,9 +27,10 @@ public final class JobMailOrdering {
         return !endDate.isBefore(today);
     }
 
-    // 정렬된 공고 리스트에서 종료일이 현재 시점 + 1년을 넘는 항목은 뒤로 보낸다.
-    // 1년 이내 그룹은 원본 정렬을 유지하고, 초과 그룹도 자체 정렬을 유지한다.
-    // 종료일 파싱이 실패하는 값(예: "영입종료시")은 1년 이내 그룹으로 둔다.
+    // 종료일이 현재 시점 + 1년을 넘는 항목(예: 2999-12-31 등 사실상 무기한)은 뒤로 보낸다.
+    // 1년 이내 그룹은 마감 임박순(종료일 오름차순)으로 정렬하며, 종료일이 없는(상시) 공고는 그 뒤에 둔다.
+    // 1년 초과 그룹은 자체 정렬(원본 순서)을 유지한 채 맨 뒤로 보낸다.
+    // 종료일 파싱이 실패하는 값(예: "영입종료시")은 1년 이내 그룹의 '종료일 없음'으로 취급한다.
     public static List<Job_mst> pushFarFutureEndDateToBottom(List<Job_mst> jobs) {
         LocalDate threshold = LocalDate.now().plusYears(1);
         List<Job_mst> within = new ArrayList<>();
@@ -41,6 +43,10 @@ public final class JobMailOrdering {
                 within.add(job);
             }
         }
+        // 1년 이내 그룹: 마감 임박순(오름차순). 종료일 없는(파싱불가/상시) 공고는 뒤로(nullsLast).
+        within.sort(Comparator.comparing(
+            (Job_mst job) -> parseEndDate(job.getEndDate()),
+            Comparator.nullsLast(Comparator.naturalOrder())));
         List<Job_mst> ordered = new ArrayList<>(within.size() + beyond.size());
         ordered.addAll(within);
         ordered.addAll(beyond);
