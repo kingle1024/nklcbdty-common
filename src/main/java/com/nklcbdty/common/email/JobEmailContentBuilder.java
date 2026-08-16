@@ -35,7 +35,7 @@ public final class JobEmailContentBuilder {
         htmlBuilder.append("</p>");
         htmlBuilder.append("<p>");
         htmlBuilder.append("더 많은 채용 공고를 보시려면 ");
-        htmlBuilder.append("<a href=\"https://www.nklcb.co.kr\" style=\"color: #007bff; text-decoration: underline\" rel=\"noreferrer noopener\" target=\"_blank\"><strong>nklcb.co.kr</strong></a>");
+        htmlBuilder.append("<a href=\"https://nklcb.netlify.app\" style=\"color: #007bff; text-decoration: underline\" rel=\"noreferrer noopener\" target=\"_blank\"><strong>nklcb.netlify.app</strong></a>");
         htmlBuilder.append("에서 확인하실 수 있어요.");
         htmlBuilder.append("</p>");
         htmlBuilder.append("</td></tr>");
