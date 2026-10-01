@@ -64,6 +64,16 @@ public final class JobEmailContentBuilder {
                 htmlBuilder.append(" | ").append(job.getPersonalHistoryEnd()).append("년 이하");
             }
 
+            // 계약직·인턴처럼 정규직이 아닌 공고는 구독자가 메일만 보고 거를 수 있도록 눈에 띄게 표시한다.
+            String empTypeLabel = employmentTypeLabel(job.getEmpType());
+            if (empTypeLabel != null) {
+                if (isRegular(job.getEmpType())) {
+                    htmlBuilder.append(" | ").append(empTypeLabel);
+                } else {
+                    htmlBuilder.append(" | <strong style=\"color: #d9534f\">").append(empTypeLabel).append("</strong>");
+                }
+            }
+
             htmlBuilder.append("</div>");
             htmlBuilder.append("</td></tr>");
         }
@@ -71,5 +81,24 @@ public final class JobEmailContentBuilder {
         htmlBuilder.append("</tbody></table>");
         htmlBuilder.append("</td></tr></tbody></table>");
         return htmlBuilder.toString();
+    }
+
+    // 크롤러별로 제각각인 고용형태 표기(정규/비정규/계약직/인턴/기간제/Full-time…)를 메일용 한글 라벨로 통일한다. 비어 있으면 null.
+    static String employmentTypeLabel(String empType) {
+        if (empType == null) return null;
+        String v = empType.trim();
+        if (v.isEmpty()) return null;
+        if (isRegular(v)) return "정규직";
+        String upper = v.toUpperCase();
+        if (v.equals("비정규") || v.equals("계약") || upper.contains("CONTRACT")) return "계약직";
+        if (upper.contains("INTERN")) return "인턴";
+        return v;
+    }
+
+    static boolean isRegular(String empType) {
+        if (empType == null) return false;
+        String upper = empType.trim().toUpperCase();
+        return upper.equals("정규") || upper.equals("정규직") || upper.equals("FULL-TIME") || upper.equals("FULL_TIME")
+            || upper.equals("FULL_TIME_WORKER") || upper.equals("REGULAR");
     }
 }
